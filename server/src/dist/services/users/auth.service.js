@@ -12,21 +12,33 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthService = void 0;
 const common_1 = require("@nestjs/common");
 const auth_repository_1 = require("../../repositories/users/auth.repository");
+const jwt_1 = require("@nestjs/jwt");
 let AuthService = class AuthService {
-    authRepo;
-    constructor(authRepo) {
-        this.authRepo = authRepo;
+    authRepository;
+    jwtService;
+    constructor(authRepository, jwtService) {
+        this.authRepository = authRepository;
+        this.jwtService = jwtService;
     }
-    getHelloWithId(id) {
-        return this.authRepo.findById(id);
-    }
-    async register(dto) {
-        return this.authRepo.createUser(dto);
+    async signIn(body) {
+        const user = await this.authRepository.findByEmail(body.email);
+        ``;
+        if (!user) {
+            throw new common_1.UnauthorizedException('User not found');
+        }
+        if (user.password !== body.password) {
+            throw new common_1.UnauthorizedException('Invalid password');
+        }
+        const payload = {
+            id: user.id, email: user.email, role: user.role,
+        };
+        return { access_token: await this.jwtService.signAsync(payload), };
     }
 };
 exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [auth_repository_1.AuthRepository])
+    __metadata("design:paramtypes", [auth_repository_1.AuthRepository,
+        jwt_1.JwtService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

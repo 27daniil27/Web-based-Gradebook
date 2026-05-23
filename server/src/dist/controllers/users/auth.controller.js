@@ -20,17 +20,17 @@ let AuthController = class AuthController {
     constructor(authService) {
         this.authService = authService;
     }
-    async getHello(id) {
-        const numericId = parseInt(id, 10);
-        return this.authService.getHelloWithId(numericId);
+    async getHello(body) {
+        console.log(body);
+        return this.authService.signIn(body);
     }
 };
 exports.AuthController = AuthController;
 __decorate([
-    (0, common_1.Get)('api/auth/:id'),
-    __param(0, (0, common_1.Param)('id')),
+    (0, common_1.Post)('/api/auth'),
+    __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "getHello", null);
 exports.AuthController = AuthController = __decorate([

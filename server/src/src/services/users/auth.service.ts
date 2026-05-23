@@ -1,16 +1,32 @@
-import { Injectable } from '@nestjs/common';
+import {Injectable, UnauthorizedException} from '@nestjs/common';
 import { AuthRepository } from '../../repositories/users/auth.repository';
-import { User } from '../../entities/user.entity';
+import {JwtService} from "@nestjs/jwt";
+import {User} from "../../entities/user.entity";
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly authRepo: AuthRepository) {}
+    constructor(
+        private authRepository: AuthRepository,
+        private jwtService: JwtService
+    ) {}
 
-  getHelloWithId(id: number) {
-    return this.authRepo.findById(id);
-  }
+    async signIn( body: {
+        email: string,
+        password: string
+    } ): Promise<{ access_token: string }> {
+        const user: User|null = await this.authRepository.findByEmail(body.email);
+``
+        if (!user) {
+            throw new UnauthorizedException( 'User not found', );
+        }
+        if (user.password !== body.password) {
+            throw new UnauthorizedException( 'Invalid password', );
+        }
 
-  async register(dto: Partial<User>) {
-    return this.authRepo.createUser(dto);
-  }
+        const payload = {
+            id: user.id, email: user.email, role: user.role,
+        };
+
+        return { access_token: await this.jwtService.signAsync(payload), };
+    }
 }

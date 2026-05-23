@@ -1,8 +1,13 @@
 import { AuthRepository } from '../../repositories/users/auth.repository';
-import { User } from '../../entities/user.entity';
+import { JwtService } from "@nestjs/jwt";
 export declare class AuthService {
-    private readonly authRepo;
-    constructor(authRepo: AuthRepository);
-    getHelloWithId(id: number): Promise<User | null>;
-    register(dto: Partial<User>): Promise<User>;
+    private authRepository;
+    private jwtService;
+    constructor(authRepository: AuthRepository, jwtService: JwtService);
+    signIn(body: {
+        email: string;
+        password: string;
+    }): Promise<{
+        access_token: string;
+    }>;
 }
