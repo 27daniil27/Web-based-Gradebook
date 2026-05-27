@@ -10,7 +10,6 @@ exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
 const typeorm_1 = require("@nestjs/typeorm");
-const auth_controller_1 = require("./controllers/users/auth.controller");
 const group_entity_1 = require("./entities/group.entity");
 const journal_entry_entity_1 = require("./entities/journal_entry.entity");
 const lesson_entity_1 = require("./entities/lesson.entity");
@@ -19,8 +18,7 @@ const subject_work_entity_1 = require("./entities/subject_work.entity");
 const subject_entity_1 = require("./entities/subject.entity");
 const submission_entity_1 = require("./entities/submission.entity");
 const user_entity_1 = require("./entities/user.entity");
-const auth_repository_1 = require("./repositories/users/auth.repository");
-const auth_service_1 = require("./services/users/auth.service");
+const auth_module_1 = require("./modules/auth.module");
 const entities = [
     group_entity_1.Group,
     journal_entry_entity_1.JournalEntry,
@@ -63,9 +61,9 @@ exports.AppModule = AppModule = __decorate([
                 },
             }),
             typeorm_1.TypeOrmModule.forFeature([user_entity_1.User]),
+            auth_module_1.AuthModule
         ],
-        controllers: [auth_controller_1.AuthController],
-        providers: [auth_repository_1.AuthRepository, auth_service_1.AuthService],
+        controllers: [],
     })
 ], AppModule);
 //# sourceMappingURL=app.module.js.map

@@ -11,29 +11,73 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
+var AuthController_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthController = void 0;
 const common_1 = require("@nestjs/common");
 const auth_service_1 = require("../../services/users/auth.service");
-let AuthController = class AuthController {
+let AuthController = AuthController_1 = class AuthController {
     authService;
+    logger = new common_1.Logger(AuthController_1.name);
     constructor(authService) {
         this.authService = authService;
     }
-    async getHello(id) {
-        const numericId = parseInt(id, 10);
-        return this.authService.getHelloWithId(numericId);
+    async getHello(request, body, response) {
+        try {
+            this.logger.log(`${request.method} ${request.originalUrl}`);
+            const tokens = await this.authService.signIn(body);
+            response.cookie('access_token', tokens.access_token, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'lax',
+                maxAge: 1000 * 60 * 5,
+            });
+            response.cookie('refresh_token', tokens.refresh_token, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'lax',
+                path: '/api/auth/refresh',
+                maxAge: 1000 * 60 * 60 * 24 * 30,
+            });
+            return { success: true };
+        }
+        catch (err) {
+            this.logger.warn(err);
+            throw err;
+        }
+    }
+    async refresh(request, response) {
+        this.logger.log(`${request.method} ${request.originalUrl}`);
+        const refreshToken = request.cookies['refresh_token'];
+        const { accessToken } = await this.authService.refreshSession(refreshToken);
+        response.cookie('access_token', accessToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: 1000 * 60 * 60 * 2,
+        });
+        return { success: true };
     }
 };
 exports.AuthController = AuthController;
 __decorate([
-    (0, common_1.Get)('api/auth/:id'),
-    __param(0, (0, common_1.Param)('id')),
+    (0, common_1.Post)('/api/auth/login'),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.Res)({ passthrough: true })),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [Object, Object, Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "getHello", null);
-exports.AuthController = AuthController = __decorate([
+__decorate([
+    (0, common_1.Post)('/api/auth/refresh'),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Res)({ passthrough: true })),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "refresh", null);
+exports.AuthController = AuthController = AuthController_1 = __decorate([
     (0, common_1.Controller)(),
     __metadata("design:paramtypes", [auth_service_1.AuthService])
 ], AuthController);

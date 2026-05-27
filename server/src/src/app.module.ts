@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule, type TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { AuthController } from './controllers/users/auth.controller';
 import { Group } from './entities/group.entity';
 import { JournalEntry } from './entities/journal_entry.entity';
 import { Lesson } from './entities/lesson.entity';
@@ -10,8 +9,8 @@ import { SubjectWork } from './entities/subject_work.entity';
 import { Subject } from './entities/subject.entity';
 import { Submission } from './entities/submission.entity';
 import { User } from './entities/user.entity';
-import { AuthRepository } from './repositories/users/auth.repository';
-import { AuthService } from './services/users/auth.service';
+import { AuthModule } from './modules/auth.module';
+
 
 const entities = [
   Group,
@@ -54,8 +53,8 @@ const entities = [
       },
     }),
     TypeOrmModule.forFeature([User]),
+      AuthModule
   ],
-  controllers: [AuthController],
-  providers: [AuthRepository, AuthService],
+  controllers: [],
 })
 export class AppModule {}

@@ -1,6 +1,15 @@
 import { AuthService } from '../../services/users/auth.service';
 export declare class AuthController {
     private readonly authService;
+    private readonly logger;
     constructor(authService: AuthService);
-    getHello(id: string): Promise<import("../../entities/user.entity").User | null>;
+    getHello(request: any, body: {
+        email: string;
+        password: string;
+    }, response: any): Promise<{
+        success: boolean;
+    }>;
+    refresh(request: any, response: any): Promise<{
+        success: boolean;
+    }>;
 }
