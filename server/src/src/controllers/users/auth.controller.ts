@@ -1,6 +1,12 @@
-import { Body, Controller, Post, Logger, Req } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  Logger,
+  Req,
+  Res,
+} from '@nestjs/common';
 import { AuthService } from '../../services/users/auth.service';
-import express from 'express';
 
 @Controller()
 export class AuthController {
@@ -10,16 +16,54 @@ export class AuthController {
 
   @Post('/api/auth/login')
   async getHello(
-    @Req() request: express.Request,
+    @Req() request,
     @Body() body: { email: string; password: string },
-  ): Promise<{ access_token: string }> {
+    @Res({ passthrough: true }) response,
+  ): Promise<{ success: boolean }> {
     try {
       this.logger.log(`${request.method} ${request.originalUrl}`);
-      return this.authService.signIn(body);
-    }
-    catch (err) {
+
+      const tokens = await this.authService.signIn(body);
+
+      response.cookie('access_token', tokens.access_token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 1000 * 60 * 60 * 2,
+      });
+
+      response.cookie('refresh_token', tokens.refresh_token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        path: '/api/auth/refresh',
+        maxAge: 1000 * 60 * 60 * 24 * 7,
+      });
+      return { success: true };
+    } catch (err) {
       this.logger.warn(err);
-      return Promise.reject(err);
+      throw err;
     }
+  }
+
+  @Post('/api/auth/refresh')
+  async refresh(
+    @Req() request: any,
+    @Res({ passthrough: true }) response: any,
+  ): Promise<{ success: boolean }> {
+    this.logger.log(`${request.method} ${request.originalUrl}`);
+
+    const refreshToken = request.cookies['refresh_token'];
+
+    const { accessToken } = await this.authService.refreshSession(refreshToken);
+
+    response.cookie('access_token', accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 1000 * 60 * 60 * 2,
+    });
+
+    return { success: true };
   }
 }

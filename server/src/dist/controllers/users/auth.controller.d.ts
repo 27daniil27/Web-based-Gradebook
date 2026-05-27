@@ -1,13 +1,15 @@
 import { AuthService } from '../../services/users/auth.service';
-import express from 'express';
 export declare class AuthController {
     private readonly authService;
     private readonly logger;
     constructor(authService: AuthService);
-    getHello(request: express.Request, body: {
+    getHello(request: any, body: {
         email: string;
         password: string;
-    }): Promise<{
-        access_token: string;
+    }, response: any): Promise<{
+        success: boolean;
+    }>;
+    refresh(request: any, response: any): Promise<{
+        success: boolean;
     }>;
 }

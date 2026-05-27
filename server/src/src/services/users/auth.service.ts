@@ -15,7 +15,7 @@ export class AuthService {
   async signIn(body: {
     email: string;
     password: string;
-  }): Promise<{ access_token: string }> {
+  }): Promise<{ access_token: string; refresh_token: string }> {
     this.logger.log('Method sign in with email and password was called');
     const user: User | null = await this.authRepository.findByEmail(body.email);
     if (!user) {
@@ -31,9 +31,41 @@ export class AuthService {
       id: user.id,
       email: user.email,
       role: user.role,
-      name: user.full_name
+      name: user.full_name,
     };
+    const access_token = await this.jwtService.signAsync(payload, {
+      expiresIn: '2h',
+    });
+    const refresh_token = await this.jwtService.signAsync(payload, {
+      expiresIn: '30d',
+    });
+    return { access_token, refresh_token };
+  }
 
-    return { access_token: await this.jwtService.signAsync(payload) };
+  async refreshSession(refreshToken: string): Promise<{ accessToken: string }> {
+    if (!refreshToken) {
+      this.logger.log('Refresh token is missing');
+      throw new UnauthorizedException('Refresh token missing');
+    }
+
+    try {
+      const payload = await this.jwtService.verifyAsync(refreshToken);
+
+      const accessToken = await this.jwtService.signAsync(
+        {
+          id: payload.id,
+          email: payload.email,
+          role: payload.role,
+          name: payload.name,
+        },
+        { expiresIn: '2h' },
+      );
+
+      return { accessToken };
+    }
+    catch (err) {
+      this.logger.warn('Invalid refresh token');
+      throw new UnauthorizedException('Invalid refresh token');
+    }
   }
 }

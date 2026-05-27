@@ -37,9 +37,35 @@ let AuthService = AuthService_1 = class AuthService {
             id: user.id,
             email: user.email,
             role: user.role,
-            name: user.full_name
+            name: user.full_name,
         };
-        return { access_token: await this.jwtService.signAsync(payload) };
+        const access_token = await this.jwtService.signAsync(payload, {
+            expiresIn: '2h',
+        });
+        const refresh_token = await this.jwtService.signAsync(payload, {
+            expiresIn: '30d',
+        });
+        return { access_token, refresh_token };
+    }
+    async refreshSession(refreshToken) {
+        if (!refreshToken) {
+            this.logger.log('Refresh token is missing');
+            throw new common_1.UnauthorizedException('Refresh token missing');
+        }
+        try {
+            const payload = await this.jwtService.verifyAsync(refreshToken);
+            const accessToken = await this.jwtService.signAsync({
+                id: payload.id,
+                email: payload.email,
+                role: payload.role,
+                name: payload.name,
+            }, { expiresIn: '2h' });
+            return { accessToken };
+        }
+        catch (err) {
+            this.logger.warn('Invalid refresh token');
+            throw new common_1.UnauthorizedException('Invalid refresh token');
+        }
     }
 };
 exports.AuthService = AuthService;

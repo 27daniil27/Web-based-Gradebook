@@ -10,5 +10,9 @@ export declare class AuthService {
         password: string;
     }): Promise<{
         access_token: string;
+        refresh_token: string;
+    }>;
+    refreshSession(refreshToken: string): Promise<{
+        accessToken: string;
     }>;
 }
