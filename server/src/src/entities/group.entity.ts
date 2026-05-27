@@ -16,4 +16,3 @@ export class Group {
   @OneToMany(() => Lesson, (l) => l.group)
   lessons: Lesson[];
 }
-
