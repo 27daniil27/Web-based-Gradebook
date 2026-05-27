@@ -11,29 +11,42 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+var AuthController_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthController = void 0;
 const common_1 = require("@nestjs/common");
 const auth_service_1 = require("../../services/users/auth.service");
-let AuthController = class AuthController {
+const express_1 = __importDefault(require("express"));
+let AuthController = AuthController_1 = class AuthController {
     authService;
+    logger = new common_1.Logger(AuthController_1.name);
     constructor(authService) {
         this.authService = authService;
     }
-    async getHello(body) {
-        console.log(body);
-        return this.authService.signIn(body);
+    async getHello(request, body) {
+        try {
+            this.logger.log(`${request.method} ${request.originalUrl}`);
+            return this.authService.signIn(body);
+        }
+        catch (err) {
+            this.logger.warn(err);
+            return Promise.reject(err);
+        }
     }
 };
 exports.AuthController = AuthController;
 __decorate([
-    (0, common_1.Post)('/api/auth'),
-    __param(0, (0, common_1.Body)()),
+    (0, common_1.Post)('/api/auth/login'),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "getHello", null);
-exports.AuthController = AuthController = __decorate([
+exports.AuthController = AuthController = AuthController_1 = __decorate([
     (0, common_1.Controller)(),
     __metadata("design:paramtypes", [auth_service_1.AuthService])
 ], AuthController);

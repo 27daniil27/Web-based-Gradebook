@@ -17,7 +17,7 @@ import { AuthRepository } from '../repositories/users/auth.repository';
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => ({
+      useFactory: (configService: ConfigService) => ({
         secret: configService.getOrThrow<string>('DB_SECRET'),
         signOptions: {
           expiresIn: '1h',

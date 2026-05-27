@@ -1,16 +1,25 @@
-import {Body, Controller, Get, Post} from '@nestjs/common';
+import { Body, Controller, Post, Logger, Req } from '@nestjs/common';
 import { AuthService } from '../../services/users/auth.service';
+import express from 'express';
 
 @Controller()
 export class AuthController {
-    constructor(private readonly authService: AuthService) {
-    }
+  private readonly logger = new Logger(AuthController.name);
 
-    @Post('/api/auth/login')
-    async getHello(@Body() body :{
-        email: string,
-        password: string
-    }) :Promise<{ access_token: string }> {
-        return this.authService.signIn(body);
+  constructor(private readonly authService: AuthService) {}
+
+  @Post('/api/auth/login')
+  async getHello(
+    @Req() request: express.Request,
+    @Body() body: { email: string; password: string },
+  ): Promise<{ access_token: string }> {
+    try {
+      this.logger.log(`${request.method} ${request.originalUrl}`);
+      return this.authService.signIn(body);
     }
+    catch (err) {
+      this.logger.warn(err);
+      return Promise.reject(err);
+    }
+  }
 }

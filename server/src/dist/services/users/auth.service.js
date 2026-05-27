@@ -8,35 +8,41 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var AuthService_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthService = void 0;
 const common_1 = require("@nestjs/common");
 const auth_repository_1 = require("../../repositories/users/auth.repository");
 const jwt_1 = require("@nestjs/jwt");
-let AuthService = class AuthService {
+let AuthService = AuthService_1 = class AuthService {
     authRepository;
     jwtService;
+    logger = new common_1.Logger(AuthService_1.name);
     constructor(authRepository, jwtService) {
         this.authRepository = authRepository;
         this.jwtService = jwtService;
     }
     async signIn(body) {
+        this.logger.log('Method sign in with email and password was called');
         const user = await this.authRepository.findByEmail(body.email);
-        ``;
         if (!user) {
+            this.logger.log('User does not exist');
             throw new common_1.UnauthorizedException('User not found');
         }
         if (user.password !== body.password) {
+            this.logger.log('User does not match password');
             throw new common_1.UnauthorizedException('Invalid password');
         }
         const payload = {
-            id: user.id, email: user.email, role: user.role,
+            id: user.id,
+            email: user.email,
+            role: user.role,
         };
-        return { access_token: await this.jwtService.signAsync(payload), };
+        return { access_token: await this.jwtService.signAsync(payload) };
     }
 };
 exports.AuthService = AuthService;
-exports.AuthService = AuthService = __decorate([
+exports.AuthService = AuthService = AuthService_1 = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [auth_repository_1.AuthRepository,
         jwt_1.JwtService])
