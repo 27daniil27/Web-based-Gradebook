@@ -22,7 +22,7 @@
     "strictBindCallApply": true,
     "noFallthroughCasesInSwitch": true,
 
-    "rootDir": "./src",
+    "rootDir": "./",
     "ignoreDeprecations": "6.0"
   }
 }
