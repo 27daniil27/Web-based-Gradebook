@@ -124,6 +124,7 @@ export class SeedService implements OnModuleInit {
     const scheduleData = [
       { subjectId: subjects[0].id, groupId: group.id, teacherId: teacher.id, dayOfWeek: 1, startTime: '09:00', endTime: '10:30', room: 'А-201' },
       { subjectId: subjects[0].id, groupId: group.id, teacherId: teacher.id, dayOfWeek: 3, startTime: '11:00', endTime: '12:30', room: 'А-201' },
+      { subjectId: subjects[0].id, groupId: group.id, teacherId: teacher.id, dayOfWeek: 4, startTime: '08:00', endTime: '09:50', room: 'А-201' },
       { subjectId: subjects[1].id, groupId: group.id, teacherId: teacher2.id, dayOfWeek: 2, startTime: '09:00', endTime: '10:30', room: 'Б-105' },
       { subjectId: subjects[1].id, groupId: group.id, teacherId: teacher2.id, dayOfWeek: 4, startTime: '13:00', endTime: '14:30', room: 'Б-105' },
       { subjectId: subjects[2].id, groupId: group2.id, teacherId: teacher.id, dayOfWeek: 5, startTime: '10:00', endTime: '11:30', room: 'В-301' },
